@@ -1,12 +1,10 @@
 from enum import Enum
-from enum import auto
-
-NUM_NOTES = 12
 
 
 # ==============================================================================
 # Intervals
 # ==============================================================================
+
 
 class Interval(Enum):
     Unison = 'Unison'

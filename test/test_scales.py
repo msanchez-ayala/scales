@@ -1,12 +1,9 @@
 import pytest
 from unittest import mock
 
-from src import scale
 from src import notes
 from src.notes import Note
-from src.scale import ChromaticScale
-from src.constants import Triad
-from src.constants import SeventhChord
+from src.scales import ChromaticScale
 
 
 class TestChromaticScale:
@@ -100,8 +97,8 @@ class TestChromaticScale:
         with pytest.raises(RuntimeError):
             self.sharp_scale._get_scale_with_flats()
 
-    @mock.patch('src.scale.ChromaticScale._get_scale_with_sharps')
-    @mock.patch('src.scale.ChromaticScale._get_scale_with_flats')
+    @mock.patch('src.scales.ChromaticScale._get_scale_with_sharps')
+    @mock.patch('src.scales.ChromaticScale._get_scale_with_flats')
     def test_scale(self, _get_scale_with_flats, _get_scale_with_sharps):
         """
         Make sure scale() calls the appropriate method given the root note.
@@ -119,62 +116,3 @@ class TestChromaticScale:
         self.natural_scale.scale()
         assert _get_scale_with_sharps.call_count == 1
         assert _get_scale_with_flats.call_count == 0
-
-
-class TestChordBuilder:
-
-    def test_major_scale(self):
-        """
-        Make sure correct accidentals are returned for the major scale
-        based on the root note.
-        """
-        builder = scale.ChordBuilder(Note.A)
-        assert builder.major_scale() == [
-            Note.A,
-            Note.B,
-            Note.CSharp,
-            Note.D,
-            Note.E,
-            Note.FSharp,
-            Note.GSharp]
-
-        builder.set_root(Note.C)
-        assert builder.major_scale() == [
-            Note.C,
-            Note.D,
-            Note.E,
-            Note.F,
-            Note.G,
-            Note.A,
-            Note.B
-        ]
-
-        builder.set_root(Note.EFlat)
-        assert builder.major_scale() == [
-            Note.EFlat,
-            Note.F,
-            Note.G,
-            Note.AFlat,
-            Note.BFlat,
-            Note.C,
-            Note.D
-        ]
-
-    def test_build_chord(self):
-        """
-        Make sure chords are constructed with appropriate accidentals based on
-        root note and chord quality.
-        """
-        builder = scale.ChordBuilder(Note.C)
-        c_maj_triad = builder.build_chord(Triad.Major)
-        assert c_maj_triad == [Note.C, Note.E, Note.G]
-
-        c_min_triad = builder.build_chord(Triad.Minor)
-        assert c_min_triad == [Note.C, Note.EFlat, Note.G]
-
-        c_dim_triad = builder.build_chord(Triad.Diminished)
-        assert c_dim_triad == [Note.C, Note.EFlat, Note.GFlat]
-
-        c_aug_triad = builder.build_chord(Triad.Augmented)
-        assert c_aug_triad == [Note.C, Note.ESharp, Note.GSharp]
-
