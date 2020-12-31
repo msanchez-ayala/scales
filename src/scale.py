@@ -1,19 +1,22 @@
-from src import notes
+from enum import Enum
+from . import constants
 from .notes import Note
-from .notes import CHROMATIC_NOTES_SHARPS
 from .notes import CHROMATIC_NOTES_FLATS
+from .notes import CHROMATIC_NOTES_SHARPS
 from .notes import FLAT_KEYS
-from .notes import SHARP_KEYS
 from .notes import NATURAL_NOTES
+from .notes import SHARP_KEYS
 
 from typing import List
 from typing import Optional
 from typing import Tuple
 
-NUM_NOTES = 12
 
-
-class BaseScale:
+class NoteCollection:
+    """
+    Object to store and provide a basic setter for the root note of a note
+    collection.
+    """
 
     def __init__(self, root: Note):
         self._root = None
@@ -33,9 +36,10 @@ class BaseScale:
         if not isinstance(root, Note):
             msg = f'Root must be of type Note, not {type(root)}.'
             raise TypeError(msg)
+        self._root = root
 
 
-class ChromaticScale(BaseScale):
+class ChromaticScale(NoteCollection):
     """
     An ascending chromatic scale starting with any natural, single sharp, or
     single flat note. No double sharps or flats are accounted for.
@@ -62,16 +66,12 @@ class ChromaticScale(BaseScale):
 
     def set_root(self, root: Note):
         """
-        Extends BaseScale's root setter, which validates the input, to
-        set the root of the chromatic scale and adjust sharps - sets to True.
-
-        See sharps setter documentation for information on how the
-        appropriate sharps designation get set.
+        Extends NoteCollection's set_root() to update sharps any time the root is
+        changed.
 
         :param root: The root note to use for this scale.
         """
         super().set_root(root)
-        self._root = root
         self.update_sharps()
 
     @property
@@ -148,36 +148,56 @@ class ChromaticScale(BaseScale):
         root_idx = notes.index(self.root)
         return notes[root_idx:] + notes[:root_idx]
 
-#
-# class MajorScale:
-#
-#     def __init__(self, root: Note):
-#         self._root = root
-#         self._chromatic_scale = self._get_chromatic_scale()
-#
-#     @property
-#     def root(self) -> Note:
-#         return self._root
-#
-#     @root.setter
-#     def root(self, root: Note):
-#         if not isinstance(root, Note):
-#             msg = f'Root must be of type Note, not {type(root)}.'
-#             raise TypeError(msg)
-#
-#     @property
-#     def chromatic_scale(self):
-#         return self._chromatic_scale
-#
-#     def scale(self) -> List[Note]:
-#         scale_notes = [self._root]
-#         degree = notes.NOTE_DEGREE_MAP[self._root]
-#         for interval in notes.MAJOR_SCALE_INTS:
-#             degree = (degree + interval) % NUM_NOTES
-#             note = Note(notes.TWELVE_NOTES[degree])
-#             scale_notes.append(note)
-#         return scale_notes
 
+class ChordBuilder(NoteCollection):
+
+    def __init__(self, root: Note):
+        """
+        Instantiate the object with a root and a chromatic scale. The chromatic
+        scale is used to derive all chord notes.
+        """
+        super().__init__(root)
+        self._chromatic_scale = None
+        self._update_chromatic_scale()
+
+    def set_root(self, root: Note):
+        """
+        Extends NoteCollection's set_root() to update the chromatic scale any time
+        the root is changed.
+
+        :param root: The root note to use for this scale.
+        """
+        super().set_root(root)
+        self._update_chromatic_scale()
+
+    @property
+    def chromatic_scale(self) -> ChromaticScale:
+        return self._chromatic_scale
+
+    def _update_chromatic_scale(self):
+        """
+        Update self._chromatic_scale with the current root. Called any time
+        the root is changed.
+        """
+        self._chromatic_scale = ChromaticScale(root=self._root)
+
+    def major_scale(self) -> List[Note]:
+        scale_notes = [self._root]
+        degree = 0
+        chromatic_notes = self._chromatic_scale.scale()
+        for interval in constants.MAJOR_SCALE_INTS:
+            degree = (degree + interval) % constants.NUM_NOTES
+            scale_notes.append(chromatic_notes[degree])
+        return scale_notes
+
+    def build_chord(self, chord_quality: Enum) -> List[Note]:
+        chord_notes = [self._root]
+        degree = 0
+        chromatic_notes = self._chromatic_scale.scale()
+        for interval in constants.ALL_CHORD_INTS[chord_quality]:
+            degree += interval
+            chord_notes.append(chromatic_notes[degree])
+        return chord_notes
 
 
 
