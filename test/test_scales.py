@@ -11,12 +11,12 @@ class TestChromaticScale:
     def setup(self):
         self.natural_scale = ChromaticScale()
         self.flat_scale = ChromaticScale(root=Note.F, sharps=False)
-        self.sharp_scale = ChromaticScale(root=Note.G)
+        self.sharp_scale = ChromaticScale(root=Note.G, sharps=True)
 
     def test_init(self):
         # Correct defaults
         assert self.natural_scale.root == Note.C
-        assert self.natural_scale.sharps is True
+        assert self.natural_scale.sharps is False
 
         # Flats by default with a flat key root
         assert self.flat_scale.sharps is False
@@ -104,15 +104,15 @@ class TestChromaticScale:
         Make sure scale() calls the appropriate method given the root note.
         """
         self.natural_scale.scale()
-        assert _get_scale_with_sharps.call_count == 1
-        assert _get_scale_with_flats.call_count == 0
+        assert _get_scale_with_sharps.call_count == 0
+        assert _get_scale_with_flats.call_count == 1
 
-        _get_scale_with_sharps.reset_mock()
+        _get_scale_with_flats.reset_mock()
         self.flat_scale.scale()
         assert _get_scale_with_sharps.call_count == 0
         assert _get_scale_with_flats.call_count == 1
 
         _get_scale_with_flats.reset_mock()
-        self.natural_scale.scale()
+        self.sharp_scale.scale()
         assert _get_scale_with_sharps.call_count == 1
         assert _get_scale_with_flats.call_count == 0

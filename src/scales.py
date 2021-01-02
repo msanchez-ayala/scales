@@ -44,7 +44,7 @@ class ChromaticScale(NoteCollection):
 
     def __init__(self,
                  root: Optional[Note] = Note.C,
-                 sharps: Optional[bool] = True):
+                 sharps: Optional[bool] = False):
         """
         Initialize scale. Silently overrides incorrect assignments to `sharps`
         e.g.::
