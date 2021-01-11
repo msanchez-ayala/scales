@@ -21,7 +21,7 @@ class TestChordBuilder:
             Note.FSharp,
             Note.GSharp]
 
-        builder.set_root(Note.C)
+        builder.root = Note.C
         assert builder.major_scale() == [
             Note.C,
             Note.D,
@@ -32,7 +32,7 @@ class TestChordBuilder:
             Note.B
         ]
 
-        builder.set_root(Note.EFlat)
+        builder.root = Note.EFlat
         assert builder.major_scale() == [
             Note.EFlat,
             Note.F,
@@ -59,4 +59,19 @@ class TestChordBuilder:
         assert c_dim_triad == [Note.C, Note.EFlat, Note.GFlat]
 
         c_aug_triad = builder.build_chord(Triad.Augmented)
-        assert c_aug_triad == [Note.C, Note.ESharp, Note.GSharp]
+        assert c_aug_triad == [Note.C, Note.E, Note.GSharp]
+
+        c_maj_7 = builder.build_chord(SeventhChord.Major)
+        assert c_maj_7 == [Note.C, Note.E, Note.G, Note.B]
+
+        c_dom_7 = builder.build_chord(SeventhChord.Dominant)
+        assert c_dom_7 == [Note.C, Note.E, Note.G, Note.BFlat]
+
+        c_min_7 = builder.build_chord(SeventhChord.Minor)
+        assert c_min_7 == [Note.C, Note.EFlat, Note.G, Note.BFlat]
+
+        c_half_dim_7 = builder.build_chord(SeventhChord.HalfDiminished)
+        assert c_half_dim_7 == [Note.C, Note.EFlat, Note.GFlat, Note.BFlat]
+
+        c_dim_7 = builder.build_chord(SeventhChord.Diminished)
+        assert c_dim_7 == [Note.C, Note.EFlat, Note.GFlat, Note.A]
