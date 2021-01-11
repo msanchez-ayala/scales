@@ -80,3 +80,7 @@ NATURAL_NOTES = set((
     Note.F,
     Note.G
 ))
+
+ALL_KEYS = SHARP_KEYS.union(FLAT_KEYS)
+USED_KEYS = NATURAL_NOTES.union(SHARP_KEYS).union(FLAT_KEYS)
+UNUSED_KEYS = ALL_KEYS.difference(USED_KEYS)

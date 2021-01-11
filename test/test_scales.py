@@ -9,14 +9,13 @@ from src.scales import ChromaticScale
 class TestChromaticScale:
 
     def setup(self):
-        self.natural_scale = ChromaticScale()
-        self.flat_scale = ChromaticScale(root=Note.F, sharps=False)
-        self.sharp_scale = ChromaticScale(root=Note.G, sharps=True)
+        self.c_scale = ChromaticScale(root=Note.C)
+        self.flat_scale = ChromaticScale(root=Note.F)
+        self.sharp_scale = ChromaticScale(root=Note.G)
 
     def test_init(self):
-        # Correct defaults
-        assert self.natural_scale.root == Note.C
-        assert self.natural_scale.sharps is False
+        # C uses sharps by default
+        assert self.c_scale.sharps is False
 
         # Flats by default with a flat key root
         assert self.flat_scale.sharps is False
@@ -29,56 +28,50 @@ class TestChromaticScale:
         Make sure update_sharps() assigns the attribute correctly based on the
         current root note.
         """
-        # Natural root can have sharps or flats
-        scale = ChromaticScale(root=Note.A)
-        scale.update_sharps(True)
-        assert scale.sharps is True
-        scale.update_sharps(False)
-        assert scale.sharps is False
-        # Default for natural note is True
-        scale.update_sharps()
-        assert scale.sharps is True
+        scale = self.c_scale
 
         # Sharp root will always have sharps
         scale._root = Note.FSharp
         scale.update_sharps()
-        assert scale.sharps is True
-        scale.update_sharps(False)
         assert scale.sharps is True
 
         # Flat root will never have sharps
         scale._root = Note.BFlat
         scale.update_sharps()
         assert scale.sharps is False
-        scale.update_sharps(True)
+
+        # C root is sharp by default
+        scale._root = Note.C
+        scale.update_sharps()
         assert scale.sharps is False
 
     def test_use_sharps_flats(self):
         """
-        Make sure use_sharps() and use_flats() always set sharps correctly.
+        Make sure calling use_sharps() or use_flats() does nothing except for
+        when the root note is C.
         """
-        # Natural keys can be assigned either flats or sharps
-        self.natural_scale.use_flats()
-        assert self.natural_scale.sharps is False
-        self.natural_scale.use_sharps()
-        assert self.natural_scale.sharps is True
-
-        # When root is a flat use_sharps() does nothing
-        scale = ChromaticScale(root=Note.BFlat)
+        scale = self.c_scale
         scale.use_sharps()
-        assert self.flat_scale.sharps is False
+        assert scale.sharps
+        scale.use_flats()
+        assert not scale.sharps
 
-        # When root is a sharp use_flats() does nothing
-        scale.set_root(Note.FSharp)
-        self.sharp_scale.use_flats()
-        assert self.sharp_scale.sharps is False
+        for root in notes.USED_KEYS:
+            if root == Note.C:
+                continue
+            scale.root = root
+            sharps = scale.sharps
+            scale.use_sharps()
+            assert scale.sharps == sharps
+            scale.use_flats()
+            assert scale.sharps == sharps
 
     def test__get_scale_with_sharps(self):
         """
         Make sure _get_scale_with_sharps produces the appropriate sequence of
         notes.
         """
-        assert self.natural_scale._get_scale_with_sharps() == \
+        assert self.c_scale._get_scale_with_sharps() == \
                notes.CHROMATIC_NOTES_SHARPS
         assert self.sharp_scale._get_scale_with_sharps() == \
                notes.CHROMATIC_NOTES_SHARPS[7:] + notes.CHROMATIC_NOTES_SHARPS[:7]
@@ -90,7 +83,7 @@ class TestChromaticScale:
         Make sure _get_scale_with_flats produces the appropriate sequence of
         notes.
         """
-        assert self.natural_scale._get_scale_with_flats() == \
+        assert self.c_scale._get_scale_with_flats() == \
                notes.CHROMATIC_NOTES_FLATS
         assert self.flat_scale._get_scale_with_flats() == \
                notes.CHROMATIC_NOTES_FLATS[5:] + notes.CHROMATIC_NOTES_FLATS[:5]
@@ -103,7 +96,7 @@ class TestChromaticScale:
         """
         Make sure scale() calls the appropriate method given the root note.
         """
-        self.natural_scale.scale()
+        self.c_scale.scale()
         assert _get_scale_with_sharps.call_count == 0
         assert _get_scale_with_flats.call_count == 1
 
