@@ -4,6 +4,7 @@ from unittest import mock
 from src import notes
 from src.notes import Note
 from src.scales import ChromaticScale
+from src.scales import MajorScale
 
 
 class TestChromaticScale:
@@ -109,3 +110,25 @@ class TestChromaticScale:
         self.sharp_scale.scale()
         assert _get_scale_with_sharps.call_count == 1
         assert _get_scale_with_flats.call_count == 0
+
+
+class TestMajorScale:
+
+    def setup(self):
+        self.c_scale = MajorScale()
+        self.flat_scale = MajorScale(Note.F)
+        self.sharp_scale = MajorScale(Note.G)
+
+    def test_init(self):
+        assert self.c_scale.root is Note.C
+        assert self.flat_scale.root is Note.F
+        assert self.sharp_scale.root is Note.G
+
+    def test__update_scale(self):
+        scale = self.c_scale
+        scale._root = Note.A
+        scale._update_scale()
+        assert scale._chromatic_scale.root is Note.A
+        assert scale.scale() == [
+        Note.A, Note.B, Note.CSharp, Note.D, Note.E, Note.FSharp, Note.GSharp
+        ]

@@ -1,6 +1,8 @@
 from typing import Optional
 from typing import Tuple
+from typing import List
 
+from . import intervals
 from .notes import Note
 from .notes import CHROMATIC_NOTES_FLATS
 from .notes import CHROMATIC_NOTES_SHARPS
@@ -106,3 +108,45 @@ class ChromaticScale:
         notes = CHROMATIC_NOTES_FLATS
         root_idx = notes.index(self._root)
         return notes[root_idx:] + notes[:root_idx]
+
+
+class MajorScale:
+    
+    def __init__(self, root: Optional[Note] = Note.C):
+        self._root = None
+        self._chromatic_scale = None
+        self._scale = None
+        self.root = root
+    
+    @property
+    def root(self) -> Note:
+        return self._root
+    
+    @root.setter
+    def root(self, root: Note):
+        self._root = root
+        self._update_scale()
+
+    def scale(self) -> Optional[List[Note]]:
+        """ 
+        Return a list of notes in the currect major scale. May be None if no root is set.
+        """
+        return self._scale
+
+    def _update_scale(self):
+        """
+        Update the chromatic and major scale based on the current root note.
+        """
+        if not self.root:
+            self._chromatic_scale = None
+            self._scale = None
+            return
+        self._chromatic_scale = ChromaticScale(self.root)
+        scale_notes = [self._root]
+        chromatic_notes = self._chromatic_scale.scale()
+        current_int = 0
+        for interval in intervals.MAJOR_SCALE_INTS:
+            current_int += interval
+            scale_notes.append(chromatic_notes[current_int])
+        self._scale = scale_notes
+
