@@ -1,10 +1,10 @@
 import pytest
 from unittest import mock
 
-from src import notes
-from src.notes import Note
-from src.scales import ChromaticScale
-from src.scales import MajorScale
+from src.backend import notes
+from src.backend.notes import Note
+from src.backend.scales import ChromaticScale
+from src.backend.scales import MajorScale
 
 
 class TestChromaticScale:
@@ -91,8 +91,8 @@ class TestChromaticScale:
         with pytest.raises(RuntimeError):
             self.sharp_scale._get_scale_with_flats()
 
-    @mock.patch('src.scales.ChromaticScale._get_scale_with_sharps')
-    @mock.patch('src.scales.ChromaticScale._get_scale_with_flats')
+    @mock.patch('src.backend.scales.ChromaticScale._get_scale_with_sharps')
+    @mock.patch('src.backend.scales.ChromaticScale._get_scale_with_flats')
     def test_scale(self, _get_scale_with_flats, _get_scale_with_sharps):
         """
         Make sure scale() calls the appropriate method given the root note.
@@ -123,6 +123,34 @@ class TestMajorScale:
         assert self.c_scale.root is Note.C
         assert self.flat_scale.root is Note.F
         assert self.sharp_scale.root is Note.G
+
+    def test_scale(self):
+        """
+        Some edge cases that were causing trouble.
+        """
+        g_flat = MajorScale(Note.GFlat)
+        assert g_flat.scale() == [
+            Note.GFlat, Note.AFlat, Note.BFlat, Note.CFlat, Note.DFlat,
+            Note.EFlat, Note.F
+        ]
+
+        c_flat = MajorScale(Note.CFlat)
+        assert c_flat.scale() == [
+            Note.CFlat, Note.DFlat, Note.EFlat, Note.FFlat, Note.GFlat,
+            Note.AFlat, Note.BFlat
+        ]
+
+        f_sharp = MajorScale(Note.FSharp)
+        assert f_sharp.scale() == [
+            Note.FSharp, Note.GSharp, Note.ASharp, Note.B, Note.CSharp,
+            Note.DSharp, Note.ESharp
+        ]
+
+        c_sharp = MajorScale(Note.CSharp)
+        assert c_sharp.scale() == [
+            Note.CSharp, Note.DSharp, Note.ESharp, Note.FSharp, Note.GSharp,
+            Note.ASharp, Note.BSharp
+        ]
 
     def test__update_scale(self):
         scale = self.c_scale

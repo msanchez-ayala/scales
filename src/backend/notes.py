@@ -9,7 +9,7 @@ class Note(enum.Enum):
     DSharp = 'D♯'
     EFlat = 'E♭'
     E = 'E'
-    ESharp = 'E♭'
+    ESharp = 'E♯'
     FFlat = 'F♭'
     F = 'F'
     FSharp = 'F♯'
@@ -51,9 +51,9 @@ CHROMATIC_NOTES_FLATS = (
     Note.AFlat,
     Note.A,
     Note.BFlat,
-    Note.B
+    Note.B,
 )
-SHARP_KEYS = set((
+SHARP_KEYS = (
     Note.G,
     Note.D,
     Note.A,
@@ -61,8 +61,8 @@ SHARP_KEYS = set((
     Note.B,
     Note.FSharp,
     Note.CSharp
-))
-FLAT_KEYS = set((
+)
+FLAT_KEYS = (
     Note.F,
     Note.BFlat,
     Note.EFlat,
@@ -70,8 +70,8 @@ FLAT_KEYS = set((
     Note.DFlat,
     Note.GFlat,
     Note.CFlat
-))
-NATURAL_NOTES = set((
+)
+NATURAL_NOTES = (
     Note.A,
     Note.B,
     Note.C,
@@ -79,8 +79,19 @@ NATURAL_NOTES = set((
     Note.E,
     Note.F,
     Note.G
-))
+)
+_SHARP_KEYS = set(SHARP_KEYS)
+_FLAT_KEYS = set(FLAT_KEYS)
+_NATURAL_NOTES = set(NATURAL_NOTES)
 
-ALL_KEYS = SHARP_KEYS.union(FLAT_KEYS)
-USED_KEYS = NATURAL_NOTES.union(SHARP_KEYS).union(FLAT_KEYS)
+ALL_KEYS = _SHARP_KEYS.union(_FLAT_KEYS)
+USED_KEYS = _NATURAL_NOTES.union(_SHARP_KEYS).union(_FLAT_KEYS)
 UNUSED_KEYS = ALL_KEYS.difference(USED_KEYS)
+
+_ROOT_FLATS_MAP = {root: i + 1 for i, root in enumerate(FLAT_KEYS)}
+_ROOT_SHARPS_MAP = {root: i + 1 for i, root in enumerate(SHARP_KEYS)}
+ROOT_ACCIDENTALS_MAP = {
+    Note.C: 0,
+    **_ROOT_FLATS_MAP,
+    **_ROOT_SHARPS_MAP
+}

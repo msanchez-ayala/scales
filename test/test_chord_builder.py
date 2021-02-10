@@ -1,7 +1,7 @@
-from src import chord_builder
-from src.intervals import Triad
-from src.intervals import SeventhChord
-from src.notes import Note
+from src.backend import chord_builder
+from src.backend.intervals import Triad
+from src.backend.intervals import SeventhChord
+from src.backend.notes import Note
 
 
 class TestChordBuilder:

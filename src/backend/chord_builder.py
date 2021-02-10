@@ -1,9 +1,9 @@
 from typing import List
 from typing import Union
 
-from src import intervals
-from src.notes import Note
-from src.scales import ChromaticScale
+from . import intervals
+from .notes import Note
+from .scales import ChromaticScale
 
 
 NUM_NOTES = 12

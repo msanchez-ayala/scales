@@ -1,0 +1,3 @@
+{
+    "files": ["qml.qrc","Constants.qml","Selector.qml","CircleAnimation.qml","NoteRect.qml","main.py","main.qml","qmldir"]
+}
