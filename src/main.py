@@ -18,9 +18,9 @@ from PySide2.QtWidgets import QVBoxLayout
 from PySide2.QtQuick import QQuickView
 from PySide2.QtQuickWidgets import QQuickWidget
 
-from backend import scales
-from backend import notes
-from backend.notes import Note
+from src.backend import scales
+from src.backend import notes
+from src.backend.notes import Note
 
 
 NOTE_ROLE = QtCore.Qt.UserRole + 1000
