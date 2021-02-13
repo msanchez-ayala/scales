@@ -34,7 +34,7 @@ NO_ACCIDENTALS = 'Flats/Sharps'
 
 class RootNotes(QStandardItemModel):
     """
-    Keep track of a collection of notes and note names to present in a view.
+    A collection of note enums and note names.
     """
 
     def __init__(self, parent=None):
@@ -45,11 +45,21 @@ class RootNotes(QStandardItemModel):
         }
         self.setItemRoleNames(roles)
 
+        root_notes = notes.USED_KEYS
+        root_notes = sorted(root_notes, key=lambda root: root.value)
+        self.addNotes(root_notes)
+
     def addNotes(self, notes: Iterable[Note]):
+        """
+        Add multiple rows of note data to the model.
+        """
         for note in notes:
             self.addNote(note)
 
-    def addNote(self, note):
+    def addNote(self, note: Note):
+        """
+        Add a row of note data to the model.
+        """
         item = QtGui.QStandardItem()
         item.setData(note, NOTE_ROLE)
         item.setData(note.value, NOTE_NAME_ROLE)
@@ -58,7 +68,7 @@ class RootNotes(QStandardItemModel):
 
 class KeySignatures(QStandardItemModel):
     """
-    Keep track of a collection of key roots and their key signatures.
+    A collection of key root enums (Note) and their key signatures.
     """
 
     def __init__(self, parent=None):
@@ -71,16 +81,20 @@ class KeySignatures(QStandardItemModel):
         for root in notes.ROOT_ACCIDENTALS_MAP.keys():
             self.addSignature(root)
 
-    def addSignature(self, root: [Note]):
+    def addSignature(self, root: Note):
+        """
+        Add a row of key signature data based on a root note.
+        """
         signature_name = self._generateSignatureName(root)
         item = QtGui.QStandardItem()
         item.setData(root, NOTE_ROLE)
         item.setData(signature_name, SIGNATUTE_NAME_ROLE)
         self.appendRow(item)
 
-    def _generateSignatureName(self, root: [Note]):
+    def _generateSignatureName(self, root: Note) -> str:
         """
         Generate the key signature name from a root note.
+        E.g: _generateSignatureName(Note.E) -> '4 Sharps'.
         """
         accidental = NO_ACCIDENTALS
         if root in notes.FLAT_KEYS:
@@ -103,18 +117,9 @@ class Manager(QObject):
         super().__init__(parent)
         self._root_notes = RootNotes()
         self._scale_note_names = QStringListModel()
+        # Initializing this model last sets the starting key to C because of
+        # ROOTS_ACCIDENTAL_MAP
         self._key_signatures = KeySignatures()
-        self._initRootsModel()
-
-    def _initRootsModel(self):
-        """
-        Create and populate a model for the roots combo with all common keys
-        (excludes those with more than 7 sharps/flats).
-        """
-        root_notes = notes.USED_KEYS
-        root_notes = sorted(root_notes, key=lambda root: root.value)
-        self._root_notes.addNotes(root_notes)
-        self._updateScaleNoteNames(root_notes[0])
 
     @Property(QtCore.QObject)
     def rootNotes(self):
