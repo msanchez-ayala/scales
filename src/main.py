@@ -175,7 +175,7 @@ class Manager(QObject):
         """
         assert isinstance(root, Note)
         maj_scale = scales.MajorScale(root)
-        notes = maj_scale.scale()
+        notes = maj_scale.notes
         note_names = [note.value for note in notes]
         self._scale_note_names.setStringList(note_names)
 

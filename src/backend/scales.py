@@ -73,10 +73,11 @@ class ChromaticScale:
             raise RuntimeError(msg)
         self._sharps = sharps
 
-    def scale(self) -> Tuple[Note]:
+    @property
+    def notes(self) -> Tuple[Note]:
         if self.sharps:
-            return self._get_scale_with_sharps()
-        return self._get_scale_with_flats()
+            return self._get_scale_notes_sharps()
+        return self._get_scale_notes_flats()
 
     def use_sharps(self):
         """
@@ -94,10 +95,10 @@ class ChromaticScale:
             return
         self._sharps = False
 
-    def _get_scale_with_sharps(self) -> Tuple[Note]:
+    def _get_scale_notes_sharps(self) -> Tuple[Note]:
         """
-        Return a chromatic scale of only sharp variations of notes starting with
-        self._root.
+        Return the notes of a chromatic scale of only sharp variations of notes
+        starting with self._root.
         """
         if self._root in FLAT_KEYS:
             msg = f'The scale root must belong to a sharp key in order to' \
@@ -112,10 +113,10 @@ class ChromaticScale:
         root_idx = chr_notes.index(self._root)
         return tuple(chr_notes[root_idx:] + chr_notes[:root_idx])
 
-    def _get_scale_with_flats(self) -> Tuple[Note]:
+    def _get_scale_notes_flats(self) -> Tuple[Note]:
         """
-        Return a chromatic scale of only flat variations of notes starting with
-        self._root.
+        Return the notes of a chromatic scale of only flat variations of notes
+        starting with self._root.
         """
         if self._root in SHARP_KEYS:
             msg = f'The scale root must belong to a flat key in order to' \
@@ -136,7 +137,7 @@ class MajorScale:
     def __init__(self, root: Optional[Note] = Note.C):
         self._root = None
         self._chromatic_scale = None
-        self._scale = None
+        self._notes = None
         self.root = root
 
     @property
@@ -148,11 +149,13 @@ class MajorScale:
         self._root = root
         self._update_scale()
 
-    def scale(self) -> Optional[List[Note]]:
+    @property
+    def notes(self) -> Optional[Tuple[Note]]:
         """
-        Return a list of notes in the currect major scale. May be None if no root is set.
+        Return a list of notes in the currect major scale. None if no root is
+        set.
         """
-        return self._scale
+        return self._notes
 
     def _update_scale(self):
         """
@@ -160,14 +163,14 @@ class MajorScale:
         """
         if not self.root:
             self._chromatic_scale = None
-            self._scale = None
+            self._notes = None
             return
         self._chromatic_scale = ChromaticScale(self.root)
         scale_notes = [self._root]
-        chromatic_notes = self._chromatic_scale.scale()
+        chromatic_notes = self._chromatic_scale.notes
         current_int = 0
         for interval in intervals.MAJOR_SCALE_INTS:
             current_int += interval
             scale_notes.append(chromatic_notes[current_int])
-        self._scale = scale_notes
+        self._notes = tuple(scale_notes)
 

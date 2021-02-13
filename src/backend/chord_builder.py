@@ -56,7 +56,7 @@ class ChordBuilder:
         """
         scale_notes = [self._root]
         degree = 0
-        chromatic_notes = self._chromatic_scale.scale()
+        chromatic_notes = self._chromatic_scale.notes
         for interval in intervals.MAJOR_SCALE_INTS:
             degree = (degree + interval) % NUM_NOTES
             scale_notes.append(chromatic_notes[degree])
@@ -77,7 +77,7 @@ class ChordBuilder:
         if chord_quality in AUGMENTED_CHORDS and self.root == Note.C:
             self._chromatic_scale.use_sharps()
             reset_sharps = True
-        chromatic_notes = self._chromatic_scale.scale()
+        chromatic_notes = self._chromatic_scale.notes
         for interval in intervals.ALL_CHORD_INTS[chord_quality]:
             chord_notes.append(chromatic_notes[interval])
         if reset_sharps:
